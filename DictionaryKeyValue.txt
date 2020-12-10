@@ -1,0 +1,54 @@
+import threading 
+from threading import*
+import time
+
+dicVariable={}
+
+def create(key,value,timeout=0):
+    if key in dicVariable:
+        print("error: this key already exists")
+    else:
+        if(key.isalpha()):
+            if len(dicVariable)<(1024*1020*1024) and value<=(16*1024*1024): 
+                if timeout==0:
+                    tReturn=[value,timeout]
+                else:
+                    tReturn=[value,time.time()+timeout]
+                if len(key)<=32: 
+                    dicVariable[key]=tReturn
+            else:
+                print("error: Memory limit exceeded!! ")
+        else:
+            print("error: Invalind key_name!! key_name must contain only alphabets and no special characters or numbers")
+
+            
+def read(key):
+    if key not in dicVariable:
+        print("error: given key does not exist in database. Please enter a valid key") 
+    else:
+        strKey=dicVariable[key]
+        if strKey[1]!=0:
+            if time.time()<strKey[1]: 
+                stri=str(key)+":"+str(strKey[0]) 
+                return stri
+            else:
+                print("error: time-to-live of",key,"has expired")
+        else:
+            stri=str(key)+":"+str(strKey[0])
+            return stri
+
+
+def delete(key):
+    if key not in dicVariable:
+        print("error: given key does not exist in database. Please enter a valid key")
+    else:
+        strKey=dicVariable[key]
+        if strKey[1]!=0:
+            if time.time()<strKey[1]: 
+                del dicVariable[key]
+                print("key is successfully deleted")
+            else:
+                print("error: time-to-live of",key,"has expired") 
+        else:
+            del dicVariable[key]
+            print("key is successfully deleted")
